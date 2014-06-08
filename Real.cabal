@@ -16,7 +16,7 @@ cabal-version:       >=1.8
 executable Real
   main-is:           Main.hs
   other-modules:     Helpers  
-  build-depends:     base ==4.6.*
+  build-depends:     base ==4.6.*,text
   hs-source-dirs:    src
                      src/Utils	
   ghc-options:	     -W 
