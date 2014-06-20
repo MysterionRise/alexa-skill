@@ -1,9 +1,10 @@
 import Helpers
-import Category
 
 main :: IO()
 main = do
-    putStrLn $ hello "K"
+    putStrLn $ hello getCurrentUser
+    putStrLn "---------------------------------------------"
+    putStrLn "Enter your command, please: "
     input <- getLine
     if input == "start" then startShell else exitShell
     

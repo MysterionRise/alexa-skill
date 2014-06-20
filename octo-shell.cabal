@@ -13,7 +13,7 @@ cabal-version:       >=1.8
 executable octo-shell
   main-is:           Main.hs
   other-modules:     Helpers, Category  
-  build-depends:     base ==4.6.*,text,process
+  build-depends:     base ==4.6.*,text,process,directory
   hs-source-dirs:    src
                      src/Utils
                      src/Model
