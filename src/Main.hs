@@ -1,8 +1,9 @@
 import Helpers
+import Category
 
 main :: IO()
 main = do
     putStrLn $ hello "K"
-    putStrLn "Octo Shell starting..."
-    runSysCmd "ls -al"
-    putStrLn "Octo Shell exiting..."
+    input <- getLine
+    if input == "start" then startShell else exitShell
+    
