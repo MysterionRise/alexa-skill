@@ -39,20 +39,29 @@ exitShell = do
 categorizedFiles :: [FilePath] -> IO [Category]
 categorizedFiles content = undefined
 
+-- todo need to be fixed
+-- take a look - http://stackoverflow.com/questions/3982491/find-out-whether-all-given-files-exists-in-haskell
 getListOfFiles :: [FilePath] -> IO [FilePath]
-getListOfFiles p =  if length p == 0
-                    then return []
-                    else do
-                         flag <- doesFileExist $ head p
+getListOfFiles [] = return []
+getListOfFiles (x:xs) = do
+                         flag <- doesFileExist x
                          if flag
                          then do
-                              t <- getListOfFiles $ tail p
-                              return (head p : t)
+                              t <- getListOfFiles xs
+                              return (x : t)
                          else do
-                              t <- getListOfFiles $ tail p
+                              t <- getListOfFiles xs
                               return t
 
+
 getListOfDirs :: [FilePath] -> IO [FilePath]
-getListOfDirs = undefined
---getListOfDirs [] = return []
---getListOfDirs (x:xs) = doesDirectoryExist x >>= (\a -> if a then return $ x : getListOfDirs xs else getListOfDirs xs)
+getListOfDirs [] = return []
+getListOfDirs (x:xs) = do
+                         flag <- doesDirectoryExist x
+                         if flag
+                         then do
+                              t <- getListOfDirs xs
+                              return (x : t)
+                         else do
+                              t <- getListOfDirs xs
+                              return t
