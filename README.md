@@ -1,2 +1,1 @@
-play-with-haskell
-=================
+Octo Shell PoC
