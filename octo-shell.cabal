@@ -1,20 +1,19 @@
-name:                octo-shell
-version:             0.1
-synopsis:            First cabal project
--- description:         
-license:             MIT
-license-file:        LICENSE
-author:              Mysterion
--- copyright:           
--- category:            
-build-type:          Simple
-cabal-version:       >=1.8
+name: octo-shell
+version: 0.1
+cabal-version: >=1.8
+build-type: Simple
+license: MIT
+license-file: LICENSE
+synopsis: First cabal project
+author: Mysterion
+data-dir: ""
 
 executable octo-shell
-  main-is:           Main.hs
-  other-modules:     Helpers, Category  
-  build-depends:     base ==4.6.*,text,process,directory
-  hs-source-dirs:    src
-                     src/Utils
-                     src/Model
-  ghc-options:	     -W 
+    build-depends: unix >=2.6.0.1 && <2.7,
+                   base ==4.6.*, text -any, process -any, directory -any
+    main-is: Main.hs
+    buildable: True
+    hs-source-dirs: src src/Utils src/Model
+    other-modules: Helpers Category
+    ghc-options: -W
+
