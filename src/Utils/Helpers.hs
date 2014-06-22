@@ -7,6 +7,7 @@ import Control.DeepSeq
 import System.Process (system)
 import System.Directory
 import System.Posix.User
+import Data.List
 import Category
 
 delimeter = "---------------------------------------------"
@@ -45,6 +46,13 @@ categorizedFiles (_:xs) = do
                          t <- categorizedFiles xs
                          return (Uncategorized : t)
 
+
+filterDotsInDirectories :: FilePath -> Bool
+filterDotsInDirectories path = not (path `isPrefixOf` ".") &&
+                               not (path `isSuffixOf` ".") &&
+                               not (path `isPrefixOf` "..") &&
+                               not (path `isSuffixOf` "..")
+
 getListOfFilesRecursively :: [FilePath] -> IO [FilePath]
 getListOfFilesRecursively [] = return []
 getListOfFilesRecursively (x:xs) = do
@@ -54,10 +62,14 @@ getListOfFilesRecursively (x:xs) = do
                                        t <- getListOfFilesRecursively xs
                                        return (x : t)
                                  else do
-                                       f <- getListOfFilesRecursively [x]
+                                       dirContents <- getDirectoryContents x
+                                       let filteredDir = filter filterDotsInDirectories dirContents
+                                       let rel = map (\z -> x ++ "/" ++ z) filteredDir
+                                       print x
+                                       print rel
+                                       f <- getListOfFilesRecursively $ rel
                                        t <- getListOfFilesRecursively xs
                                        return (force f ++ force t)
-
 
 -- todo need to be fixed
 -- take a look - http://stackoverflow.com/questions/3982491/find-out-whether-all-given-files-exists-in-haskell
