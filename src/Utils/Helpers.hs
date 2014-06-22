@@ -3,10 +3,13 @@
 module Helpers where
 
 import Control.Exception
+import Control.DeepSeq
 import System.Process (system)
 import System.Directory
 import System.Posix.User
 import Category
+
+delimeter = "---------------------------------------------"
 
 -- not portable, posix stuff
 greetUserInPosixWay = do
@@ -27,17 +30,34 @@ startShell = do
         print files
         dirs <- getListOfDirs $ filter (\a -> a /= "." && a /= ".." ) content
         print dirs
-        categories <- categorizedFiles files
+        allFiles <- getListOfFilesRecursively $ filter (\a -> a /= "." && a /= ".." ) content
+        categories <- categorizedFiles allFiles
         print categories
         -- more to come
         exitShell
 
-exitShell = do
-          putStrLn "Octo Shell exiting..."
-          -- more to come
+exitShell = putStrLn delimeter >> putStrLn "Octo Shell exiting..."
 
+-- dummy version of categorizer
 categorizedFiles :: [FilePath] -> IO [Category]
-categorizedFiles content = undefined
+categorizedFiles [] = return []
+categorizedFiles (_:xs) = do
+                         t <- categorizedFiles xs
+                         return (Uncategorized : t)
+
+getListOfFilesRecursively :: [FilePath] -> IO [FilePath]
+getListOfFilesRecursively [] = return []
+getListOfFilesRecursively (x:xs) = do
+                                 flag <- doesFileExist x
+                                 if flag
+                                 then do
+                                       t <- getListOfFilesRecursively xs
+                                       return (x : t)
+                                 else do
+                                       f <- getListOfFilesRecursively [x]
+                                       t <- getListOfFilesRecursively xs
+                                       return (force f ++ force t)
+
 
 -- todo need to be fixed
 -- take a look - http://stackoverflow.com/questions/3982491/find-out-whether-all-given-files-exists-in-haskell

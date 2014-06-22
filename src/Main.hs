@@ -5,7 +5,7 @@ main :: IO()
 main = do
     greetUser os
     putStrLn ""
-    putStrLn "---------------------------------------------"
+    putStrLn delimeter
     putStrLn "Enter your command, please: "
     input <- getLine
     if input == "start" then startShell else exitShell
