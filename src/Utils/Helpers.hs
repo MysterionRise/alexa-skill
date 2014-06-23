@@ -3,11 +3,11 @@
 module Helpers where
 
 import Control.Exception
-import Control.DeepSeq
+import Control.DeepSeq (force)
 import System.Process (system)
 import System.Directory
 import System.Posix.User
-import Data.List
+import Data.List (isInfixOf)
 import Category
 
 delimeter = "---------------------------------------------"
@@ -48,10 +48,8 @@ categorizedFiles (_:xs) = do
 
 
 filterDotsInDirectories :: FilePath -> Bool
-filterDotsInDirectories path = not (path `isPrefixOf` ".") &&
-                               not (path `isSuffixOf` ".") &&
-                               not (path `isPrefixOf` "..") &&
-                               not (path `isSuffixOf` "..")
+filterDotsInDirectories path = not (path `isInfixOf` ".") &&
+                               not (path `isInfixOf` "..") 
 
 getListOfFilesRecursively :: [FilePath] -> IO [FilePath]
 getListOfFilesRecursively [] = return []
