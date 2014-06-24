@@ -4,7 +4,6 @@ module Helpers where
 
 import Control.Exception
 import Control.DeepSeq (force)
-import System.Process (system)
 import System.Directory
 import System.Posix.User
 import Data.List (isInfixOf)
@@ -22,20 +21,20 @@ greetHardcodedUser = putStrLn $ "Hi, User!"
 
 greetUser os = if os == "windows" then greetHardcodedUser else greetUserInPosixWay
 
-runSysCmd = system
-
 startShell = do
         putStrLn "Octo Shell starting..."
         content <- getCurrentDirectory >>= getDirectoryContents
-        files <- getListOfFiles $ filter (\a -> a /= "." && a /= ".." ) content
+        files <- getListOfFiles $ filterDotsInFilePaths content
         print files
-        dirs <- getListOfDirs $ filter (\a -> a /= "." && a /= ".." ) content
+        dirs <- getListOfDirs $ filterDotsInFilePaths content
         print dirs
-        allFiles <- getListOfFilesRecursively $ filter (\a -> a /= "." && a /= ".." ) content
+        allFiles <- getListOfFilesRecursively $ filterDotsInFilePaths content
         categories <- categorizedFiles allFiles
         print categories
         -- more to come
         exitShell
+
+
 
 exitShell = putStrLn delimeter >> putStrLn "Octo Shell exiting..."
 
@@ -47,9 +46,10 @@ categorizedFiles (_:xs) = do
                          return (Uncategorized : t)
 
 
-filterDotsInDirectories :: FilePath -> Bool
-filterDotsInDirectories path = not (path `isInfixOf` ".") &&
-                               not (path `isInfixOf` "..") 
+
+
+filterDotsInFilePaths :: [FilePath] -> [FilePath]
+filterDotsInFilePaths = filter (\x -> not (x `isInfixOf` ".") && not (x `isInfixOf` ".."))
 
 getListOfFilesRecursively :: [FilePath] -> IO [FilePath]
 getListOfFilesRecursively [] = return []
@@ -61,7 +61,7 @@ getListOfFilesRecursively (x:xs) = do
                                        return (x : t)
                                  else do
                                        dirContents <- getDirectoryContents x
-                                       let filteredDir = filter filterDotsInDirectories dirContents
+                                       let filteredDir = filterDotsInFilePaths dirContents
                                        let rel = map (\z -> x ++ "/" ++ z) filteredDir
                                        print x
                                        print rel
