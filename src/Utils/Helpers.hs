@@ -25,28 +25,25 @@ startShell = do
         putStrLn "Octo Shell starting..."
         content <- getCurrentDirectory >>= getDirectoryContents
         files <- getListOfFiles $ filterDotsInFilePaths content
-        print files
+        -- debug output
+        -- print files
         dirs <- getListOfDirs $ filterDotsInFilePaths content
-        print dirs
+        -- debug output
+        -- print dirs
         allFiles <- getListOfFilesRecursively $ filterDotsInFilePaths content
         categories <- categorizedFiles allFiles
         print categories
         -- more to come
         exitShell
 
-
-
 exitShell = putStrLn delimeter >> putStrLn "Octo Shell exiting..."
 
 -- dummy version of categorizer
 categorizedFiles :: [FilePath] -> IO [Category]
 categorizedFiles [] = return []
-categorizedFiles (_:xs) = do
+categorizedFiles (x:xs) = do
                          t <- categorizedFiles xs
-                         return (Uncategorized : t)
-
-
-
+                         return (Uncategorized x : t)
 
 filterDotsInFilePaths :: [FilePath] -> [FilePath]
 filterDotsInFilePaths = filter (\x -> not (x `isInfixOf` ".") && not (x `isInfixOf` ".."))
@@ -62,9 +59,9 @@ getListOfFilesRecursively (x:xs) = do
                                  else do
                                        dirContents <- getDirectoryContents x
                                        let filteredDir = filterDotsInFilePaths dirContents
-                                       let rel = map (\z -> x ++ "/" ++ z) filteredDir
-                                       print x
-                                       print rel
+                                       let rel = map (\curr -> x ++ "/" ++ curr) filteredDir
+                                       --print x
+                                       --print rel
                                        f <- getListOfFilesRecursively $ rel
                                        t <- getListOfFilesRecursively xs
                                        return (force f ++ force t)
