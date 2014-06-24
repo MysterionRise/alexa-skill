@@ -4,8 +4,7 @@ import System.Info (os)
 main :: IO()
 main = do
     greetUser os
-    putStrLn ""
-    putStrLn delimeter
     putStrLn "Enter your command, please: "
+    putStrLn delimeter
     input <- getLine
-    if input == "start" then startShell else exitShell
+    if input == "start" then runShell else exit

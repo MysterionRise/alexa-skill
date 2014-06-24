@@ -19,10 +19,10 @@ greetUserInPosixWay = do
 -- for non posix stuff
 greetHardcodedUser = putStrLn $ "Hi, User!"
 
-greetUser os = if os == "windows" then greetHardcodedUser else greetUserInPosixWay
+greetUser os = if os == "windows" then greetHardcodedUser else greetUserInPosixWay >> putStrLn delimeter
 
-startShell = do
-        putStrLn "Octo Shell starting..."
+runShell = do   
+        startShell     
         content <- getCurrentDirectory >>= getDirectoryContents
         files <- getListOfFiles $ filterDotsInFilePaths content
         -- debug output
@@ -36,14 +36,21 @@ startShell = do
         -- more to come
         exitShell
 
+startShell = putStrLn "Octo Shell starting..." >> putStrLn delimeter
+
 exitShell = putStrLn delimeter >> putStrLn "Octo Shell exiting..."
 
+exit = putStrLn delimeter >> putStrLn "Couldn't parse command [Try to type 'start']"
+
 -- dummy version of categorizer
+categorizeFile :: FilePath -> Category
+categorizeFile file = Uncategorized file
+
 categorizedFiles :: [FilePath] -> IO [Category]
 categorizedFiles [] = return []
 categorizedFiles (x:xs) = do
                          t <- categorizedFiles xs
-                         return (Uncategorized x : t)
+                         return (categorizeFile x : t)
 
 filterDotsInFilePaths :: [FilePath] -> [FilePath]
 filterDotsInFilePaths = filter (\x -> not (x `isInfixOf` ".") && not (x `isInfixOf` ".."))
