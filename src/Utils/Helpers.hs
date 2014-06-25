@@ -43,6 +43,7 @@ exitShell = putStrLn delimeter >> putStrLn "Octo Shell exiting..."
 exit = putStrLn delimeter >> putStrLn "Couldn't parse command [Try to type 'start']"
 
 -- dummy version of categorizer
+-- need to improve it
 categorizeFile :: FilePath -> Category
 categorizeFile file = Uncategorized file
 
