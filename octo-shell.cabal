@@ -1,15 +1,14 @@
 name: octo-shell
-version: 0.1
+version: 0.1.1
 cabal-version: >=1.8
 build-type: Simple
 license: MIT
 license-file: LICENSE
-synopsis: First cabal project
 author: Mysterion
 data-dir: ""
 
 executable octo-shell
-    build-depends: deepseq >=1.3.0.1 && <1.4, unix >=2.6.0.1 && <2.7,
+    build-depends: deepseq >=1.3.0.1 && <1.4, unix >=2.6.0.1 ,
                    base ==4.6.*, text -any, process -any, directory -any
     main-is: Main.hs
     buildable: True
