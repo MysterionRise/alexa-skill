@@ -5,6 +5,7 @@ module Helpers where
 import Control.Exception
 import Control.DeepSeq (force)
 import System.Directory
+import System.FilePath
 import System.Posix.User
 import Data.List (isInfixOf)
 import Category
@@ -45,7 +46,12 @@ exit = putStrLn delimeter >> putStrLn "Couldn't parse command [Try to type 'star
 -- dummy version of categorizer
 -- need to improve it
 categorizeFile :: FilePath -> Category
-categorizeFile file = Uncategorized file
+--categorizeFile file = Uncategorized file
+categorizeFile file = hardcodedCategory (takeExtension file) file
+
+hardcodedCategory :: FilePath -> String -> Category
+hardcodedCategory file ".txt" = Text file
+hardcodedCategory file x = Uncategorized file
 
 categorizedFiles :: [FilePath] -> IO [Category]
 categorizedFiles [] = return []
