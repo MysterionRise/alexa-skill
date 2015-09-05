@@ -50,8 +50,8 @@ categorizeFile :: FilePath -> Category
 categorizeFile file = hardcodedCategory (takeExtension file) file
 
 hardcodedCategory :: FilePath -> String -> Category
-hardcodedCategory file ".txt" = Text file
-hardcodedCategory file x = Uncategorized file
+hardcodedCategory ".txt" file = Text file
+hardcodedCategory x file = Uncategorized file
 
 categorizedFiles :: [FilePath] -> IO [Category]
 categorizedFiles [] = return []
