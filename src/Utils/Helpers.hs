@@ -11,16 +11,19 @@ import Data.List (isInfixOf)
 import Category
 
 delimeter = "---------------------------------------------"
+greeting = "Hello, "
+defaultGreeting = greeting ++ "User!"
 
 -- not portable, posix stuff
 greetUserInPosixWay = do
         user <- getRealUserID >>= getUserEntryForID
-        putStrLn $ "Hi, " ++ (userName user)
+        putStrLn $ greeting ++ (userName user)
 
 -- for non posix stuff
-greetHardcodedUser = putStrLn $ "Hi, User!"
+greetHardcodedUser = putStrLn $ defaultGreeting
 
-greetUser os = if os == "windows" then greetHardcodedUser else greetUserInPosixWay >> putStrLn delimeter
+greetUser "windows" = greetHardcodedUser
+greetUser os = greetUserInPosixWay >> putStrLn delimeter
 
 runShell = do   
         startShell     
