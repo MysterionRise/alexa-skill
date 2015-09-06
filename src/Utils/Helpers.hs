@@ -51,6 +51,22 @@ categorizeFile file = hardcodedCategory (takeExtension file) file
 
 hardcodedCategory :: FilePath -> String -> Category
 hardcodedCategory ".txt" file = Text file
+hardcodedCategory ".doc" file = Text file
+hardcodedCategory ".rtf" file = Text file
+hardcodedCategory ".jpg" file = Image file
+hardcodedCategory ".bmp" file = Image file
+hardcodedCategory ".tiff" file = Image file
+hardcodedCategory ".png" file = Image file
+hardcodedCategory ".gif" file = Image file
+hardcodedCategory ".mp3" file = Music file
+hardcodedCategory ".wav" file = Music file
+hardcodedCategory ".ogg" file = Music file
+hardcodedCategory ".flac" file = Music file
+hardcodedCategory ".avi" file = Video file
+hardcodedCategory ".mp4" file = Video file
+hardcodedCategory ".mkv" file = Video file
+hardcodedCategory ".mov" file = Video file
+hardcodedCategory ".flv" file = Video file
 hardcodedCategory x file = Uncategorized file
 
 categorizedFiles :: [FilePath] -> IO [Category]
