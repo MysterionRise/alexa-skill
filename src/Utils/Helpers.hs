@@ -25,6 +25,10 @@ greetHardcodedUser = putStrLn $ defaultGreeting
 greetUser "windows" = greetHardcodedUser
 greetUser os = greetUserInPosixWay >> putStrLn delimeter
 
+runCommand "help" = putStrLn "Help was requested. Couldn't find help file now"
+runCommand "start" = runShell
+runCommand s = putStrLn "Couldn't parse command [Try to type 'help']"
+
 runShell = do   
         startShell     
         content <- getCurrentDirectory >>= getDirectoryContents
@@ -44,12 +48,9 @@ startShell = putStrLn "Octo Shell starting..." >> putStrLn delimeter
 
 exitShell = putStrLn delimeter >> putStrLn "Octo Shell exiting..."
 
-exit = putStrLn delimeter >> putStrLn "Couldn't parse command [Try to type 'start']"
-
 -- dummy version of categorizer
 -- need to improve it
 categorizeFile :: FilePath -> Category
---categorizeFile file = Uncategorized file
 categorizeFile file = hardcodedCategory (takeExtension file) file
 
 hardcodedCategory :: FilePath -> String -> Category

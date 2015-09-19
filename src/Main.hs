@@ -7,4 +7,4 @@ main = do
     putStrLn "Enter your command, please: "
     putStrLn delimeter
     input <- getLine
-    if input == "start" then runShell else exit
+    runCommand $ input
