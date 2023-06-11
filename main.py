@@ -1,5 +1,6 @@
 import glob
 import time
+from datetime import datetime
 
 import pandas as pd
 import requests
@@ -28,7 +29,7 @@ def make_request_with_retries(url):
     adapter = HTTPAdapter(max_retries=retry_strategy)
     session.mount("https://", adapter)
     session.mount("http://", adapter)
-    time.sleep(0.5)
+    time.sleep(1)
     try:
         response = session.get(url)
         response.raise_for_status()
@@ -43,15 +44,22 @@ def make_request_with_retries(url):
         print(f"Something went wrong: {err}")
 
 
-def get_match_links(user_id, pages):
+def read_links_from_file():
+    file_name = "data/match_links.csv"
+    with open(file_name, "r") as file:
+        match_links = [link.strip() for link in file.readlines()]
+    return match_links
+
+
+def get_match_links(user_id, from_page, to_page):
     match_links = []
 
-    for page in range(1, pages + 1):
-        url = f"https://www.dotabuff.com/players/{user_id}/matches?page={page}"
+    for page in range(from_page, to_page + 1):
+        url = f"https://www.dotabuff.com/players/{user_id}/matches?page={page}&lobby_type=ranked_matchmaking"
 
         # Send a GET request
         response = make_request_with_retries(url)
-        time.sleep(0.1)
+        time.sleep(1)
         # If the GET request is successful, the status code will be 200
         if response is not None:
             # Create an html element from the response content
@@ -68,6 +76,9 @@ def get_match_links(user_id, pages):
                 if match_link_element:  # If there is a link
                     match_link = match_link_element[0].get("href")
                     match_links.append(match_link)
+                    # Write to file
+                    with open("data/match_links.csv", "a") as file:
+                        file.write(match_link + "\n")
         else:
             print(f"Unable to retrieve page {page}")
 
@@ -79,7 +90,7 @@ def get_picks_bans(match_id):
 
     # Send a GET request
     response = make_request_with_retries(url)
-    time.sleep(0.1)
+    time.sleep(1)
     # If the GET request is successful, the status code will be 200
     if response is not None:
         # Create an html element from the response content
@@ -115,7 +126,7 @@ def get_match_result(match_id):
 
     # Send a GET request
     response = make_request_with_retries(url)
-    time.sleep(0.1)
+    time.sleep(1)
     # If the GET request is successful, the status code will be 200
     if response is not None:
         # Create an html element from the response content
@@ -159,7 +170,7 @@ def get_ability_order(match_id, user_id):
 
     # Send a GET request
     response = make_request_with_retries(url)
-    time.sleep(0.1)
+    time.sleep(1)
     # If the GET request is successful, the status code will be 200
     if response is not None:
         # Create an html element from the response content
@@ -207,19 +218,36 @@ def merge_csv_files(directory):
     merged_df.to_csv(directory + "/merged.csv", index=False)
 
 
-if __name__ == "__main__":
-    user_id = "118794347"
-    # match_links = get_match_links(user_id, pages=50)
-    match_links = get_match_links(user_id, pages=1)
+def get_match_date(match_id):
+    url = f"https://www.dotabuff.com/{match_id}"
 
-    chunk_size = 10  # number of matches per chunk
+    # Send a GET request
+    response = make_request_with_retries(url)
+    time.sleep(1)
+    # If the GET request is successful, the status code will be 200
+    if response is not None:
+        tree = html.fromstring(response.content)
+        dl_elements = tree.xpath(
+            "/html/body/div[2]/div[2]/div[3]/div[3]/div[1]/div[2]/dl"
+        )
+        for dl in dl_elements:
+            time_element = dl.xpath("./dd/time")
+            if time_element:
+                date_string = time_element[0].attrib.get("datetime")
+                return datetime.strptime(date_string, "%Y-%m-%dT%H:%M:%S%z")
+    else:
+        print(f"Unable to retrieve match_date for match with id {match_id}")
+
+
+def process_matches_in_chunks(user_id, match_links, start_chunk=0, chunk_size=10):
     match_links_count = len(match_links)
 
-    for i in range(0, match_links_count, chunk_size):
+    for i in range(start_chunk * chunk_size, match_links_count, chunk_size):
         rows = []
         chunk_links = match_links[i : i + chunk_size]
 
         for link in chunk_links:
+            match_date = get_match_date(link)
             match_result = get_match_result(link)
             picks_bans = get_picks_bans(link)
             abilities = get_ability_order(link, user_id)
@@ -227,6 +255,7 @@ if __name__ == "__main__":
             rows.append(
                 [
                     user_id,
+                    match_date,
                     link.split("/")[-1],
                     "|".join([hero for action, hero in picks_bans if action == "pick"]),
                     "|".join([hero for action, hero in picks_bans if action == "ban"]),
@@ -236,10 +265,13 @@ if __name__ == "__main__":
                 ]
             )
 
+        time.sleep(1)
+
         df = pd.DataFrame(
             rows,
             columns=[
                 "user_id",
+                "date",
                 "match_id",
                 "picks",
                 "bans",
@@ -249,3 +281,8 @@ if __name__ == "__main__":
             ],
         )
         df.to_csv(f"matches_{user_id}_chunk_{i // chunk_size + 1}.csv", index=False)
+
+
+if __name__ == "__main__":
+    user_id = "118794347"
+    process_matches_in_chunks(user_id, read_links_from_file(), start_chunk=21)
