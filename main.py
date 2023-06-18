@@ -201,7 +201,7 @@ def get_ability_order(match_id, user_id):
 
 def merge_csv_files(directory):
     # Use glob to match all csv files in the directory
-    csv_files = glob.glob(directory + "/*.csv")
+    csv_files = glob.glob(directory + "/*_chunk_*.csv")
 
     # Create a list to hold dataframes
     df_list = []
@@ -285,4 +285,5 @@ def process_matches_in_chunks(user_id, match_links, start_chunk=0, chunk_size=10
 
 if __name__ == "__main__":
     user_id = "118794347"
-    process_matches_in_chunks(user_id, read_links_from_file(), start_chunk=21)
+    # process_matches_in_chunks(user_id, read_links_from_file(), start_chunk=126)
+    merge_csv_files("data")
